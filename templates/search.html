@@ -1,0 +1,143 @@
+<!-- templates/search.html -->
+{% extends "base.html" %}
+
+{% block title %}Buscar Filmes - Movie App{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h1 class="text-center mb-4">
+                <i class="fas fa-search"></i> Buscar Filmes
+            </h1>
+            
+            <form method="GET" class="mb-4">
+                <div class="input-group input-group-lg">
+                    <input type="text" class="form-control" name="q" 
+                           placeholder="Digite o nome do filme..." 
+                           value="{{ query }}" required>
+                    <button class="btn btn-primary" type="submit">
+                        <i class="fas fa-search"></i> Buscar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if query %}
+        {% if results and results.results %}
+        <div class="row">
+            <div class="col-12">
+                <h3 class="mb-4">
+                    Resultados para "{{ query }}" 
+                    <span class="badge bg-secondary">{{ results.total_results }} encontrados</span>
+                </h3>
+            </div>
+        </div>
+        
+        <div class="row">
+            {% for movie in results.results %}
+            <div class="col-md-6 col-lg-3 mb-4">
+                <div class="card movie-card border-0 shadow">
+                    <a href="/movie/{{ movie.id }}" class="text-decoration-none">
+                        {% if movie.poster_path %}
+                        <img src="{{ image_base_url }}{{ movie.poster_path }}" 
+                             class="card-img-top movie-poster" alt="{{ movie.title }}">
+                        {% else %}
+                        <div class="card-img-top movie-poster bg-secondary d-flex align-items-center justify-content-center">
+                            <i class="fas fa-film fa-3x text-white"></i>
+                        </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h6 class="card-title text-dark">{{ movie.title }}</h6>
+                            <p class="card-text">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar"></i> {{ movie.release_date|format_date }}
+                                </small>
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-primary">
+                                    <i class="fas fa-star"></i> {{ movie.vote_average|round(1) }}
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if results.total_pages > 1 %}
+        <nav aria-label="Navegação de páginas">
+            <ul class="pagination justify-content-center">
+                {% if results.page > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="?q={{ query }}&page={{ results.page - 1 }}">Anterior</a>
+                </li>
+                {% endif %}
+
+                {% if results.page > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="?q={{ query }}&page=1">1</a>
+                </li>
+                {% endif %}
+
+                {% if results.page > 2 %}
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+                {% endif %}
+
+                <li class="page-item active">
+                    <span class="page-link">{{ results.page }}</span>
+                </li>
+
+                {% if results.page < results.total_pages - 1 %}
+                <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                </li>
+                {% endif %}
+
+                {% if results.page < results.total_pages %}
+                <li class="page-item">
+                    <a class="page-link" href="?q={{ query }}&page={{ results.total_pages }}">{{ results.total_pages }}</a>
+                </li>
+                {% endif %}
+
+                {% if results.page < results.total_pages %}
+                <li class="page-item">
+                    <a class="page-link" href="?q={{ query }}&page={{ results.page + 1 }}">Próximo</a>
+                </li>
+                {% endif %}
+            </ul>
+
+            <div class="text-center mt-3">
+                <small class="text-muted">
+                    Página {{ results.page }} de {{ results.total_pages }}
+                    ({{ results.total_results }} resultados)
+                </small>
+            </div>
+        </nav>
+        {% endif %}
+
+        {% else %}
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i>
+            Nenhum filme encontrado para "{{ query }}". Tente outro termo de busca.
+        </div>
+        {% endif %}
+    {% else %}
+    <div class="row">
+        <div class="col-lg-8 mx-auto text-center">
+            <div class="card border-0">
+                <div class="card-body py-5">
+                    <i class="fas fa-search fa-4x text-muted mb-4"></i>
+                    <h4 class="text-muted">Digite algo no campo acima para buscar filmes</h4>
+                    <p class="text-muted">Você pode buscar por título, diretor ou ator</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
